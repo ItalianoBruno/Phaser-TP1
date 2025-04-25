@@ -105,14 +105,17 @@ export default class Game extends Phaser.Scene {
 
     // Iniciar el contador de tiempo
   this.time.addEvent({
-    delay: 1000, // 1 segundo
+     delay: 1000, // 1 segundo
+    //
     callback: () => {
       this.remainingTime -= 1; // Resta 1 al contador cada segundo
       this.timeText.setText(`Time: ${this.remainingTime}`); // Actualiza el texto del contador
 
       if (this.remainingTime <= 0) {
         this.gameOver = true; // Finalizar el juego si el tiempo llega a 0
-        this.deadScreen();
+        this.timeText.setText(`Time: 0`); // Actualiza el texto del contador
+      }
+      if (this.gameOver === true) {
         this.timeText.setText(`Time: 0`); // Actualiza el texto del contador
       }
     },
@@ -183,6 +186,7 @@ export default class Game extends Phaser.Scene {
     this.isInAir = true; // El jugador ha tocado el suelo
   }
   if (this.gameOver) {
+    this.deadScreen();
     this.player.setTint(0xff0000);
     this.player.anims.play("turn");
     this.physics.pause();
@@ -205,6 +209,7 @@ export default class Game extends Phaser.Scene {
   collectStar(player, star) {
     star.disableBody(true, true);
 
+    this.remainingTime += 1; // Aumenta el tiempo restante al recoger una estrella
     this.score += 10;
     this.scoreText.setText(`Score: ${this.score}`);
 
