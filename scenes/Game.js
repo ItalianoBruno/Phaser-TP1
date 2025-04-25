@@ -97,7 +97,7 @@ export default class Game extends Phaser.Scene {
     });
 
                       //temporizador
-    this.remainingTime = 3 ; // Tiempo inicial en segundos
+    this.remainingTime = 30 ; // Tiempo inicial en segundos
     this.timeText = this.add.text(635, 16, `Time: ${this.remainingTime}`, {
       fontSize: "32px",
       fill: "#000",
@@ -110,9 +110,10 @@ export default class Game extends Phaser.Scene {
       this.remainingTime -= 1; // Resta 1 al contador cada segundo
       this.timeText.setText(`Time: ${this.remainingTime}`); // Actualiza el texto del contador
 
-      if (this.remainingTime <= -1) {
+      if (this.remainingTime <= 0) {
         this.gameOver = true; // Finalizar el juego si el tiempo llega a 0
         this.deadScreen();
+        this.timeText.setText(`Time: 0`); // Actualiza el texto del contador
       }
     },
     loop: true,
@@ -182,20 +183,22 @@ export default class Game extends Phaser.Scene {
     this.isInAir = true; // El jugador ha tocado el suelo
   }
   if (this.gameOver) {
-    this.shdeadScreen();
+    this.player.setTint(0xff0000);
+    this.player.anims.play("turn");
+    this.physics.pause();
   }
   }
 
   // Pantalla de muerte
   deadScreen() {
-    this.add.text(400, 300, "Game Over", {
-      fontSize: "64px",
-      fill: "#fff",
+    this.add.text(155, 200, "Game Over", {
+      fontSize: "96px",
+      fill: "#FF0000",
     }).setOrigin(0.0);
 
-    this.add.text(400, 400, "Press R to Restart", {
-      fontSize: "32px",
-      fill: "#fff",
+    this.add.text(420, 365, "Press R to Restart", {
+      fontSize: "48px",
+      fill: "#000000",
     }).setOrigin(0.5);
   }
 
