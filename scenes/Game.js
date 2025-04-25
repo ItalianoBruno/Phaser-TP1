@@ -27,6 +27,17 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+
+    this.add.text(400, 300, "Game Over", {
+      fontSize: "64px",
+      fill: "#fff",
+    }).setOrigin(0.0);
+
+    this.add.text(400, 400, "Press R to Restart", {
+      fontSize: "32px",
+      fill: "#fff",
+    }).setOrigin(0.5);
+
     // create game objects
     this.add.image(400, 300, "sky");
 
@@ -40,7 +51,7 @@ export default class Game extends Phaser.Scene {
 
     this.player = this.physics.add.sprite(100, 450, "dude");
 
-    this.player.setBounce(0.2);
+    this.player.setBounce(0.105);
     this.player.setCollideWorldBounds(true);
 
     this.anims.create({
@@ -85,9 +96,33 @@ export default class Game extends Phaser.Scene {
       fill: "#000",
     });
 
+                      //temporizador
+    this.remainingTime = 3 ; // Tiempo inicial en segundos
+    this.timeText = this.add.text(635, 16, `Time: ${this.remainingTime}`, {
+      fontSize: "32px",
+      fill: "#000",
+    });
+
+    // Iniciar el contador de tiempo
+  this.time.addEvent({
+    delay: 1000, // 1 segundo
+    callback: () => {
+      this.remainingTime -= 1; // Resta 1 al contador cada segundo
+      this.timeText.setText(`Time: ${this.remainingTime}`); // Actualiza el texto del contador
+
+      if (this.remainingTime <= -1) {
+        this.gameOver = true; // Finalizar el juego si el tiempo llega a 0
+        this.deadScreen();
+      }
+    },
+    loop: true,
+  });
+
     this.physics.add.collider(this.player, this.platforms);
 
     this.physics.add.collider(this.stars, this.platforms);
+
+    this.physics.add.collider(this.bombs, this.platforms);
 
     this.physics.add.overlap(
       this.player,
@@ -104,6 +139,11 @@ export default class Game extends Phaser.Scene {
       null,
       this
     );
+    // Var para controlar si jugador aire T/F
+    this.isInAir = false
+
+    // Tecla para reiniciar escena
+  this.restartKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
   }
 
   update() {
@@ -123,8 +163,40 @@ export default class Game extends Phaser.Scene {
     }
 
     if (this.cursors.up.isDown && this.player.body.touching.down) {
-      this.player.setVelocityY(-330);
+      this.player.setVelocityY(-300);
+    } else if (this.cursors.down.isDown && this.isInAir && !this.player.body.touching.down) // Si el jugador está en el aire y presiona hacia abajo 
+    {
+      this.player.setVelocityY(270);
+      this.isInAir = false; // Desactivar la bandera al caer
     }
+
+     // Detectar si el jugador está en el aire
+  if (this.cursors.up.isDown && this.player.body.touching.down) {
+    this.player.setVelocityY(-300);
+  }
+  // Reiniciar la escena si se presiona la tecla R
+  if (Phaser.Input.Keyboard.JustDown(this.restartKey)) {
+    this.scene.restart();
+  }
+  if (this.player.body.touching.down) {
+    this.isInAir = true; // El jugador ha tocado el suelo
+  }
+  if (this.gameOver) {
+    this.shdeadScreen();
+  }
+  }
+
+  // Pantalla de muerte
+  deadScreen() {
+    this.add.text(400, 300, "Game Over", {
+      fontSize: "64px",
+      fill: "#fff",
+    }).setOrigin(0.0);
+
+    this.add.text(400, 400, "Press R to Restart", {
+      fontSize: "32px",
+      fill: "#fff",
+    }).setOrigin(0.5);
   }
 
   collectStar(player, star) {
