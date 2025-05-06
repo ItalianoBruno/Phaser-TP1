@@ -209,7 +209,8 @@ export default class Game extends Phaser.Scene {
   collectStar(player, star) {
     star.disableBody(true, true);
 
-    this.remainingTime += 1; // Aumenta el tiempo restante al recoger una estrella
+    //this.remainingTime += 1; // Aumenta el tiempo restante al recoger una estrella
+  
     this.score += 10;
     this.scoreText.setText(`Score: ${this.score}`);
 
